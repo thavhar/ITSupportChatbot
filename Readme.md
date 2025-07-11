@@ -9,23 +9,23 @@ Here's how you can make your project title large and ensure other key points sta
 
 ## 📚 Table of Contents
 
-  * [Project Overview]
-  * [Features]
-  * [Architecture]
-  * [Setup & Deployment Guide]
-      * [Prerequisites]
-      * [1. DynamoDB Setup]
-      * [2. SES Setup]
-      * [3. Lambda Functions]
-      * [4. API Gateway]
-      * [5. Cognito Setup]
-      * [6. Lex V2 Bot Setup]
-      * [7. Frontend Deployment]
-  * [Troubleshooting Guide]
-  * [Usage]
-  * [Future Enhancements]
-  * [Contributing]
-  * [License]
+  * Project Overview
+  * Features
+  * Architecture
+  * Setup & Deployment Guide
+      * Prerequisites
+      * 1. DynamoDB Setup
+      * 2. SES Setup
+      * 3. Lambda Functions
+      * 4. API Gateway
+      * 5. Cognito Setup
+      * 6. Lex V2 Bot Setup
+      * 7. Frontend Deployment
+  * Troubleshooting Guide
+  * Usage
+  * Future Enhancements
+  * Contributing
+  * License
 
 -----
 
