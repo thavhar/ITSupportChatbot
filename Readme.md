@@ -81,8 +81,8 @@ Our IT Support Chatbot comes packed with features to provide a robust and user-f
 ## 🗺️ Architecture
 
 This chatbot is built on a robust, scalable, and cost-efficient **serverless architecture** leveraging the power of AWS services.
+```javascript
 
-```mermaid
 graph TD
     subgraph Frontend (HTML/CSS/JS)
         A[User Browser]
@@ -119,9 +119,8 @@ graph TD
     F -- Logs --> K
     I -- Logs --> K
     C -- Logs --> K
-````
 
------
+```
 
 ## ⚙️ Setup & Deployment Guide
 
