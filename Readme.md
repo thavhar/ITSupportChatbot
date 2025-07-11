@@ -1,7 +1,4 @@
 
-You're looking to make your README even more impactful\! To achieve a "big title" and emphasize other points, Markdown uses **headings** and **bolding**. The largest heading is created with a single hash `#`, and subsequent headings get smaller with more hashes (`##`, `###`, etc.). For bold text, you wrap the text in double asterisks (`**text**`).
-
-Here's how you can make your project title large and ensure other key points stand out, ready for you to paste:
 
 # 🚀 IT SUPPORT CHATBOT WITH AWS LEX, LAMBDA, API GATEWAY, AND DYNAMODB
 
