@@ -1,0 +1,731 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini-Inspired Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles for the Gemini-inspired look */
+        :root {
+            --gemini-light-bg: #FFFFFF;
+            --gemini-light-text: #202124;
+            --gemini-light-secondary-text: #5F6368;
+            --gemini-light-accent: #1A73E8; /* Google Blue */
+            --gemini-light-hover: #F0F4F9;
+            --gemini-light-border: #DADCE0;
+            --gemini-light-user-bubble: #E8F0FE; /* Lighter blue for user */
+            --gemini-light-bot-bubble: #F1F3F4; /* Light grey for bot */
+
+            --gemini-dark-bg: #202124;
+            --gemini-dark-text: #E8EAED;
+            --gemini-dark-secondary-text: #BDC1C6;
+            --gemini-dark-accent: #8AB4F8; /* Lighter Google Blue for dark mode */
+            --gemini-dark-hover: #3C4043;
+            --gemini-dark-border: #3C4043;
+            --gemini-dark-user-bubble: #3367D6; /* Darker blue for user */
+            --gemini-dark-bot-bubble: #303134; /* Slightly darker grey for bot */
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Google Sans', sans-serif;
+            background-color: var(--gemini-light-bg);
+            color: var(--gemini-light-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode {
+            background-color: var(--gemini-dark-bg);
+            color: var(--gemini-dark-text);
+        }
+
+        .chat-container {
+            background-color: var(--gemini-light-bg);
+            border-radius: 1.5rem;
+            box-shadow: 0 1px 3px rgba(60, 64, 67, .3), 0 4px 8px rgba(60, 64, 67, .15); /* More subtle Google-like shadow */
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 32rem; /* Wider for more spacious feel */
+            height: 90vh; /* Slightly taller */
+            overflow: hidden;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--gemini-light-border); /* Subtle border */
+        }
+
+        .chat-container.dark-mode {
+            background-color: var(--gemini-dark-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .4), 0 4px 8px rgba(0, 0, 0, .2);
+            border: 1px solid var(--gemini-dark-border);
+        }
+
+        .chat-header {
+            background-color: var(--gemini-light-bg); /* Header blends with container */
+            color: var(--gemini-light-text);
+            padding: 1.25rem 1.5rem; /* Adjusted padding */
+            text-align: center;
+            font-size: 1.5rem; /* Slightly smaller font for header */
+            font-weight: 500; /* Medium weight like Google Sans */
+            border-bottom: 1px solid var(--gemini-light-border); /* Subtle bottom border */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .chat-header.dark-mode {
+            background-color: var(--gemini-dark-bg);
+            color: var(--gemini-dark-text);
+            border-bottom: 1px solid var(--gemini-dark-border);
+        }
+
+        .chat-header-title {
+            flex-grow: 1;
+            text-align: left; /* Align title to left like Gemini */
+            margin-right: 0; /* Remove margin-right as toggle is now left */
+            font-weight: 500;
+        }
+
+        .chat-box {
+            flex-grow: 1;
+            padding: 1rem 1.5rem; /* Consistent padding */
+            overflow-y: auto;
+            background-color: var(--gemini-light-bg);
+            scrollbar-width: thin;
+            scrollbar-color: var(--gemini-light-accent) var(--gemini-light-bg);
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-box.dark-mode {
+            background-color: var(--gemini-dark-bg);
+            scrollbar-color: var(--gemini-dark-accent) var(--gemini-dark-bg);
+        }
+
+        .chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: var(--gemini-light-bg);
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background-color: var(--gemini-light-accent);
+            border-radius: 10px;
+            border: 2px solid var(--gemini-light-bg);
+        }
+
+        .chat-box.dark-mode::-webkit-scrollbar-track {
+            background: var(--gemini-dark-bg);
+        }
+
+        .chat-box.dark-mode::-webkit-scrollbar-thumb {
+            background-color: var(--gemini-dark-accent);
+            border: 2px solid var(--gemini-dark-bg);
+        }
+
+        .message-container {
+            display: flex;
+            margin-bottom: 0.75rem; /* Spacing between messages */
+        }
+
+        .user-message {
+            background-color: var(--gemini-light-user-bubble);
+            color: var(--gemini-light-text);
+            padding: 0.75rem 1rem; /* Slightly more horizontal padding */
+            border-radius: 1.25rem 1.25rem 0.25rem 1.25rem; /* Rounded corners, sharp on bottom right */
+            max-width: 85%; /* Increased max-width */
+            margin-left: auto;
+            margin-right: 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08); /* Subtle shadow */
+            animation: fadeIn 0.3s ease-out forwards;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .user-message-wrapper {
+            margin-left: auto; /* Push user message to the right */
+        }
+
+        .user-message.dark-mode {
+            background-color: var(--gemini-dark-user-bubble);
+            color: var(--gemini-dark-text);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .bot-message {
+            background-color: var(--gemini-light-bot-bubble);
+            color: var(--gemini-light-text);
+            padding: 0.75rem 1rem;
+            border-radius: 1.25rem 1.25rem 1.25rem 0.25rem; /* Rounded corners, sharp on bottom left */
+            max-width: 85%;
+            margin-left: 0;
+            margin-right: auto;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+            animation: fadeIn 0.3s ease-out forwards;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .bot-message.dark-mode {
+            background-color: var(--gemini-dark-bot-bubble);
+            color: var(--gemini-dark-text);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .chat-input {
+            display: flex;
+            align-items: center; /* Vertically align items */
+            padding: 0.75rem 1rem; /* Reduced padding */
+            border-top: 1px solid var(--gemini-light-border);
+            background-color: var(--gemini-light-bg);
+            transition: border-top 0.3s ease, background-color 0.3s ease;
+        }
+
+        .chat-input.dark-mode {
+            border-top: 1px solid var(--gemini-dark-border);
+            background-color: var(--gemini-dark-bg);
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            padding: 0.75rem 1.25rem; /* Slightly more padding for input */
+            border: 1px solid var(--gemini-light-border);
+            border-radius: 1.5rem; /* More rounded input */
+            outline: none;
+            box-shadow: none; /* No shadow on input by default */
+            color: var(--gemini-light-text);
+            background-color: var(--gemini-light-bg);
+            transition: border-color 0.2s, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .chat-input input:focus {
+            border-color: var(--gemini-light-accent);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2); /* Subtle blue glow on focus */
+        }
+
+        .chat-input input.dark-mode {
+            background-color: var(--gemini-dark-bg);
+            border-color: var(--gemini-dark-border);
+            color: var(--gemini-dark-text);
+        }
+
+        .chat-input button {
+            margin-left: 0.75rem;
+            background-color: var(--gemini-light-accent);
+            color: #ffffff;
+            padding: 0.75rem;
+            border-radius: 50%; /* Circular button */
+            font-weight: 700;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px; /* Fixed width/height for circular button */
+            height: 44px;
+        }
+
+        .chat-input button:hover {
+            background-color: #1565C0; /* Darker blue on hover */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        
+        .chat-input button:active {
+            transform: scale(0.95);
+        }
+
+        .chat-input button.dark-mode {
+            background-color: var(--gemini-dark-accent);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .chat-input button.dark-mode:hover {
+            background-color: #6D9EEB; /* Slightly darker accent on hover in dark mode */
+        }
+
+        .response-card {
+            border: 1px solid var(--gemini-light-border);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 0.75rem;
+            margin-bottom: 0.75rem;
+            background-color: var(--gemini-light-bg);
+            box-shadow: 0 1px 3px rgba(60, 64, 67, .1), 0 1px 2px rgba(60, 64, 67, .05); /* Subtle card shadow */
+            text-align: left; /* Align card content to left */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Align content to the start */
+            animation: fadeIn 0.4s ease-out forwards;
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .response-card.dark-mode {
+            background-color: var(--gemini-dark-bg);
+            border-color: var(--gemini-dark-border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .2), 0 1px 2px rgba(0, 0, 0, .1);
+        }
+
+        .response-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            object-fit: cover;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .response-card.dark-mode img {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .response-card h4 {
+            font-size: 1.15rem; /* Slightly smaller for card titles */
+            font-weight: 500;
+            color: var(--gemini-light-text);
+            margin-bottom: 0.25rem;
+            transition: color 0.3s ease;
+        }
+        
+        .response-card h4.dark-mode {
+            color: var(--gemini-dark-text);
+        }
+
+        .response-card p {
+            font-size: 0.9rem; /* Smaller for card descriptions */
+            color: var(--gemini-light-secondary-text);
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+        
+        .response-card p.dark-mode {
+            color: var(--gemini-dark-secondary-text);
+        }
+
+        .response-card button {
+            background-color: var(--gemini-light-hover); /* Lighter background for buttons */
+            color: var(--gemini-light-accent); /* Google Blue text for buttons */
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            margin-top: 0.3rem;
+            margin-bottom: 0.3rem;
+            transition: all 0.2s ease-in-out;
+            transform: scale(1);
+            box-shadow: none; /* No shadow on card buttons */
+            cursor: pointer;
+            font-weight: 500;
+            border: 1px solid var(--gemini-light-border); /* Subtle border for buttons */
+        }
+        .response-card button:hover {
+            background-color: #E6EEF7; /* Slightly darker hover for light mode buttons */
+            transform: none; /* No scale transform on hover for Gemini buttons */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08); /* Subtle shadow on hover */
+        }
+        .response-card button:active {
+            background-color: #D2E3FC;
+        }
+
+        .response-card button.dark-mode {
+            background-color: var(--gemini-dark-hover);
+            color: var(--gemini-dark-accent);
+            border: 1px solid var(--gemini-dark-border);
+        }
+        .response-card button.dark-mode:hover {
+            background-color: #4C5156;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        }
+        .response-card button.dark-mode:active {
+            background-color: #5C6065;
+        }
+
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dark Mode Toggle Specific Styles */
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--gemini-light-secondary-text); /* Icon color matches secondary text */
+            transition: color 0.3s ease;
+            display: flex; /* To center SVG icon */
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem; /* Clickable area */
+            border-radius: 50%; /* Rounded clickable area */
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--gemini-light-hover);
+        }
+
+        .theme-toggle.dark-mode {
+            color: var(--gemini-dark-secondary-text);
+        }
+
+        .theme-toggle.dark-mode:hover {
+            background-color: var(--gemini-dark-hover);
+        }
+
+        .theme-toggle svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Icon for light mode (moon) - default visible */
+        .theme-toggle svg.moon {
+            display: block;
+        }
+        /* Icon for dark mode (sun) - default hidden */
+        .theme-toggle svg.sun {
+            display: none;
+        }
+
+        /* When dark mode is active, show sun and hide moon */
+        .dark-mode .theme-toggle svg.moon {
+            display: none;
+        }
+        .dark-mode .theme-toggle svg.sun {
+            display: block;
+        }
+
+        /* Adjustments for the theme toggle position in the header */
+        .chat-header .theme-toggle {
+            position: static; /* Remove absolute positioning */
+            transform: none; /* Remove transform */
+            margin-left: auto; /* Push to the right */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="chat-container" id="chatApp">
+        <div class="chat-header" id="chatHeader">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <svg class="moon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                <svg class="sun" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-13 0a1 1 0 100-2H2a1 1 0 100 2h1zm-.464-4.95l-.707-.707a1 1 0 00-1.414 1.414l.707.707a1 1 0 001.414-1.414zm2.12 10.607a1 1 0 010-1.414l-.706-.707a1 1 0 111.414-1.414l.707.707a1 1 0 01-1.414 1.414zM10 15a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM10 4a6 6 0 100 12 6 6 0 000-12z" clip-rule="evenodd" fill-rule="evenodd"></path></svg>
+            </button>
+            <div class="chat-header-title">IT SUPPORT CHATBOT</div>
+        </div>
+        <div class="chat-box" id="chatBox">
+        </div>
+        <div class="chat-input" id="chatInput">
+            <input type="text" id="userInput" placeholder="Message IT Support Chatbot" aria-label="Chat input field">
+            <button onclick="sendMessage()" aria-label="Send message">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1158.0.min.js"></script>
+
+    <script>
+        // --- AWS Configuration ---
+        let lexruntime;
+        let chatApp, chatBox, userInput, themeToggle, chatHeader, chatInput;
+
+        // --- IMPORTANT: UPDATE THESE VALUES FOR LEX V2 ---
+        const LEX_BOT_ID = 'YOUR BOT ID';
+        const LEX_BOT_ALIAS_ID = 'YOUR BOT ALIAS ID';
+        const LEX_LOCALE_ID = 'en_US';
+
+        // Generate a unique session ID for the user
+        const sessionId = 'web-user-' + Date.now();
+
+        // --- NEW: API Gateway Invoke URLs ---
+        const API_GATEWAY_ESCALATE_URL = 'YOUR API URL'; // Your escalation API URL
+        const API_GATEWAY_STORAGE_URL = 'YOUR API URL'; // <-- IMPORTANT: PASTE YOUR NEW STORAGE API URL HERE
+
+        /**
+         * Displays a message in the chat interface.
+         */
+        function displayMessage(message, sender) {
+            const msgWrapper = document.createElement('div');
+            msgWrapper.className = sender === 'user' ? 'user-message-wrapper' : 'bot-message-wrapper';
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
+            msgDiv.textContent = message;
+            
+            // Apply dark mode class to messages if dark mode is active
+            if (document.body.classList.contains('dark-mode')) {
+                msgDiv.classList.add('dark-mode');
+            }
+
+            msgWrapper.appendChild(msgDiv);
+            chatBox.appendChild(msgWrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        /**
+         * Displays a response card (buttons, image, title, subtitle) in the chat interface.
+         */
+        function displayResponseCard(card) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'response-card';
+
+            if (card.imageUrl) {
+                const img = document.createElement('img');
+                img.src = card.imageUrl;
+                img.alt = card.title || 'Response card image';
+                cardDiv.appendChild(img);
+            }
+
+            const title = document.createElement('h4');
+            if (card.title) {
+                title.textContent = card.title;
+                cardDiv.appendChild(title);
+            }
+
+            const subtitle = document.createElement('p');
+            if (card.subTitle) {
+                subtitle.textContent = card.subTitle;
+                cardDiv.appendChild(subtitle);
+            }
+
+            if (card.buttons && Array.isArray(card.buttons)) {
+                card.buttons.forEach(button => {
+                    const btn = document.createElement('button');
+                    btn.textContent = button.text;
+                    btn.onclick = () => {
+                        userInput.value = button.value;
+                        sendMessage();
+                    };
+                    cardDiv.appendChild(btn);
+                });
+            }
+            
+            // Apply dark mode class to response card elements if dark mode is active
+            if (document.body.classList.contains('dark-mode')) {
+                cardDiv.classList.add('dark-mode');
+                title.classList.add('dark-mode');
+                subtitle.classList.add('dark-mode');
+                cardDiv.querySelectorAll('button').forEach(btn => btn.classList.add('dark-mode'));
+            }
+
+            chatBox.appendChild(cardDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        
+        /**
+         * Function to escalate the query to a human via Lambda and SES.
+         */
+        async function escalateToHuman(queryText) {
+            try {
+                const response = await fetch(API_GATEWAY_ESCALATE_URL + '/escalate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: queryText }) // Send the query in the request body
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Gateway request failed with status ${response.status}`);
+                }
+                
+                console.log("Query successfully escalated.");
+                // You can optionally display a confirmation or handle the success case here.
+
+            } catch (error) {
+                console.error('Error escalating query:', error);
+                // Optionally display an error message to the user in the chat
+                displayMessage('Sorry, there was an issue escalating your request. Please try again later.', 'bot');
+            }
+        }
+
+        /**
+         * NEW: Function to store user queries (and bot responses) in DynamoDB.
+         */
+        async function storeUserQuery(queryText, senderType) {
+            try {
+                const response = await fetch(API_GATEWAY_STORAGE_URL + '/store-query', { // Use your new storage endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sessionId: sessionId,
+                        queryText: queryText,
+                        sender: senderType // 'user' or 'bot'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Storage API Gateway request failed with status ${response.status}`);
+                }
+                console.log(`Query from ${senderType} stored successfully in DynamoDB.`);
+            } catch (error) {
+                console.error('Error storing query in DynamoDB:', error);
+                // This is a background operation, so no need to display to user
+            }
+        }
+
+
+        /**
+         * MODIFIED: Sends the user's message to the AWS Lex bot and processes the response.
+         * Now includes logging bot confidence score and storing queries in DynamoDB.
+         */
+        function sendMessage() {
+            const messageText = userInput.value.trim();
+            if (messageText === '') return;
+
+            displayMessage(messageText, 'user');
+            // Store user's message in DynamoDB
+            storeUserQuery(messageText, 'user');
+
+            userInput.value = '';
+
+            const params = {
+                botId: LEX_BOT_ID,
+                botAliasId: LEX_BOT_ALIAS_ID,
+                localeId: LEX_LOCALE_ID,
+                sessionId: sessionId,
+                text: messageText,
+            };
+
+            // Call the Lex V2 runtime service using recognizeText
+            lexruntime.recognizeText(params, function(err, data) {
+                if (err) {
+                    console.error('Error interacting with Amazon Lex:', err);
+                    displayMessage('Error: Could not connect to the chatbot. Please check your configuration and network.', 'bot');
+                    // Consider storing this error event in DynamoDB as well
+                    storeUserQuery(`ERROR: ${err.message}`, 'bot'); // Store the error message as a bot response
+                } else {
+                    console.log("Lex V2 Response:", data);
+
+                    // --- Log Confidence Score ---
+                    const topInterpretation = data.interpretations?.[0];
+                    if (topInterpretation) {
+                        const topIntentName = topInterpretation.intent?.name;
+                        let confidenceToLog = topInterpretation.nluConfidence?.score;
+                        let confidenceSource = 'NLU Intent';
+
+                        if (topInterpretation.source === 'KNOWLEDGE_BASE' && topInterpretation.interpretiveUnit?.interpretations?.length > 0) {
+                            confidenceToLog = topInterpretation.interpretiveUnit.interpretations[0].score;
+                            confidenceSource = 'Knowledge Base';
+                        }
+                        
+                        console.log(`--- Confidence Log ---`);
+                        console.log(`User Input: "${messageText}"`);
+                        console.log(`Top Intent: ${topIntentName || 'N/A'}`);
+                        console.log(`Confidence Score (${confidenceSource}): ${confidenceToLog !== undefined ? confidenceToLog.toFixed(4) : 'N/A'}`);
+                        console.log(`--- End Confidence Log ---`);
+                    }
+                    // --- END Log Confidence Score ---
+
+
+                    // --- Logic to Display Messages and Handle Fallback ---
+                    if (data.messages && data.messages.length > 0) {
+                        data.messages.forEach(message => {
+                            if (message.contentType === 'PlainText') {
+                                displayMessage(message.content, 'bot');
+                                // Store bot's message in DynamoDB
+                                storeUserQuery(message.content, 'bot');
+                            } else if (message.contentType === 'ImageResponseCard') {
+                                displayResponseCard(message.imageResponseCard);
+                                // Store a representation of the card message in DynamoDB
+                                storeUserQuery(`Bot displayed card: ${message.imageResponseCard.title || ''} - ${message.imageResponseCard.subTitle || ''}`, 'bot');
+                            }
+                        });
+                    } else {
+                        // If Lex returned NO messages, then it's a true fallback scenario.
+                        displayMessage('I am sorry, I could not find an answer for that. Your query has been stored and will be reviewed by a human agent.', 'bot');
+                        escalateToHuman(messageText);
+                        // Store the fallback message in DynamoDB
+                        storeUserQuery('Bot fallback: No answer found, query escalated.', 'bot');
+                    }
+                }
+            });
+        }
+
+        // --- Dark Mode Functionality ---
+        function applyDarkMode(isDarkMode) {
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            chatApp.classList.toggle('dark-mode', isDarkMode);
+            chatHeader.classList.toggle('dark-mode', isDarkMode);
+            chatBox.classList.toggle('dark-mode', isDarkMode);
+            chatInput.classList.toggle('dark-mode', isDarkMode);
+            userInput.classList.toggle('dark-mode', isDarkMode);
+            // Ensure the send button also gets the dark mode class
+            chatInput.querySelector('button').classList.toggle('dark-mode', isDarkMode); 
+            themeToggle.classList.toggle('dark-mode', isDarkMode); /* Apply to toggle button itself */
+
+            // Re-apply dark mode to existing messages and cards
+            document.querySelectorAll('.user-message, .bot-message').forEach(el => {
+                el.classList.toggle('dark-mode', isDarkMode);
+            });
+            document.querySelectorAll('.response-card').forEach(card => {
+                card.classList.toggle('dark-mode', isDarkMode);
+                card.querySelector('h4')?.classList.toggle('dark-mode', isDarkMode);
+                card.querySelector('p')?.classList.toggle('dark-mode', isDarkMode);
+                card.querySelectorAll('button').forEach(btn => btn.classList.toggle('dark-mode', isDarkMode));
+            });
+
+            // Save preference to localStorage
+            localStorage.setItem('darkModeEnabled', isDarkMode);
+        }
+
+
+        // --- Event Listeners and Initial Load (All encapsulated in DOMContentLoaded) ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // Get references to DOM elements AFTER the DOM is fully loaded
+            chatApp = document.getElementById('chatApp');
+            chatBox = document.getElementById('chatBox');
+            userInput = document.getElementById('userInput');
+            themeToggle = document.getElementById('themeToggle');
+            chatHeader = document.getElementById('chatHeader');
+            chatInput = document.getElementById('chatInput');
+
+            // Initialize Lex Runtime V2 Service client AFTER AWS SDK is loaded and AWS.config is set
+            AWS.config.region = 'us-east-1'; // Your bot's region
+            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                IdentityPoolId: 'us-east-1:07b917e7-6247-49bb-9294-1b358883699e' // Your Cognito Identity Pool ID
+            });
+            lexruntime = new AWS.LexRuntimeV2(); // Initialize here
+
+            // Attach Event Listeners
+            themeToggle.addEventListener('click', () => {
+                const isCurrentlyDarkMode = document.body.classList.contains('dark-mode');
+                applyDarkMode(!isCurrentlyDarkMode);
+            });
+
+            userInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Check for saved dark mode preference and apply
+            const savedDarkMode = localStorage.getItem('darkModeEnabled');
+            if (savedDarkMode === 'true') {
+                applyDarkMode(true);
+            }
+
+            // Initial welcome message (now that DOM and listeners are ready)
+            displayMessage('Hi! How can I help you today?', 'bot');
+        });
+
+    </script>
+</body>
+</html>
