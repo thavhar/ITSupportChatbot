@@ -9,23 +9,23 @@ Here's how you can make your project title large and ensure other key points sta
 
 ## 📚 Table of Contents
 
-  * [Project Overview](https://www.google.com/search?q=%23project-overview)
-  * [Features](https://www.google.com/search?q=%23features)
-  * [Architecture](https://www.google.com/search?q=%23architecture)
-  * [Setup & Deployment Guide](https://www.google.com/search?q=%23setup--deployment-guide)
-      * [Prerequisites](https://www.google.com/search?q=%23prerequisites)
-      * [1. DynamoDB Setup](https://www.google.com/search?q=%231-aws-dynamodb-table-setup)
-      * [2. SES Setup](https://www.google.com/search?q=%232-aws-ses-simple-email-service-setup)
-      * [3. Lambda Functions](https://www.google.com/search?q=%233-aws-lambda-functions)
-      * [4. API Gateway](https://www.google.com/search?q=%234-aws-api-gateway-setup)
-      * [5. Cognito Setup](https://www.google.com/search?q=%235-aws-cognito-identity-pool-setup)
-      * [6. Lex V2 Bot Setup](https://www.google.com/search?q=%236-aws-lex-v2-bot-setup)
-      * [7. Frontend Deployment](https://www.google.com/search?q=%237-frontend-deployment-htmljavascript)
-  * [Troubleshooting Guide](https://www.google.com/search?q=%23troubleshooting-guide)
-  * [Usage](https://www.google.com/search?q=%23usage)
-  * [Future Enhancements](https://www.google.com/search?q=%23future-enhancements)
-  * [Contributing](https://www.google.com/search?q=%23contributing)
-  * [License](https://www.google.com/search?q=%23license)
+  * [Project Overview]
+  * [Features]
+  * [Architecture]
+  * [Setup & Deployment Guide]
+      * [Prerequisites]
+      * [1. DynamoDB Setup]
+      * [2. SES Setup]
+      * [3. Lambda Functions]
+      * [4. API Gateway]
+      * [5. Cognito Setup]
+      * [6. Lex V2 Bot Setup]
+      * [7. Frontend Deployment]
+  * [Troubleshooting Guide]
+  * [Usage]
+  * [Future Enhancements]
+  * [Contributing]
+  * [License]
 
 -----
 
