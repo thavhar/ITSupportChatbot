@@ -1,27 +1,24 @@
 
 
-# 🚀 **IT Support Chatbot with AWS Lex, Lambda, API Gateway, and DynamoDB**
-
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![AWS](https://img.shields.io/badge/built%20with-AWS-orange.svg)](https://aws.amazon.com/)
+````markdown
+# 🚀 IT Support Chatbot with AWS Lex, Lambda, API Gateway, and DynamoDB
 
 ---
 
-## 📚 **Table of Contents**
+## 📚 Table of Contents
 
 * [Project Overview](#project-overview)
 * [Features](#features)
 * [Architecture](#architecture)
 * [Setup & Deployment Guide](#setup--deployment-guide)
-
-  * [Prerequisites](#prerequisites)
-  * [1. DynamoDB Setup](#1-aws-dynamodb-table-setup)
-  * [2. SES Setup](#2-aws-ses-simple-email-service-setup)
-  * [3. Lambda Functions](#3-aws-lambda-functions)
-  * [4. API Gateway](#4-aws-api-gateway-setup)
-  * [5. Cognito Setup](#5-aws-cognito-identity-pool-setup)
-  * [6. Lex V2 Bot Setup](#6-aws-lex-v2-bot-setup)
-  * [7. Frontend Deployment](#7-frontend-deployment-htmljavascript)
+    * [Prerequisites](#prerequisites)
+    * [1. DynamoDB Setup](#1-aws-dynamodb-table-setup)
+    * [2. SES Setup](#2-aws-ses-simple-email-service-setup)
+    * [3. Lambda Functions](#3-aws-lambda-functions)
+    * [4. API Gateway](#4-aws-api-gateway-setup)
+    * [5. Cognito Setup](#5-aws-cognito-identity-pool-setup)
+    * [6. Lex V2 Bot Setup](#6-aws-lex-v2-bot-setup)
+    * [7. Frontend Deployment](#7-frontend-deployment-htmljavascript)
 * [Troubleshooting Guide](#troubleshooting-guide)
 * [Usage](#usage)
 * [Future Enhancements](#future-enhancements)
@@ -30,67 +27,54 @@
 
 ---
 
-## 🎯 **Project Overview**
+## 🎯 Project Overview
 
-This project implements an intelligent IT Support Chatbot designed to provide automated assistance for common IT troubleshooting queries.
+This project delivers an intelligent **IT Support Chatbot** designed to revolutionize how common IT troubleshooting queries are handled. It provides **automated, instant assistance** and, for more complex issues, seamlessly **escalates queries to human agents via email**, ensuring no request goes unanswered. Every interaction is meticulously **logged in DynamoDB** for future analysis, audits, and continuous bot improvement.
 
-For questions beyond its knowledge base, it seamlessly escalates the query to a human agent via email and logs all interactions for future analysis and bot improvement.
-
-✨ **Bonus:** The chatbot features a responsive web interface with a dark mode toggle for enhanced user experience.
+✨ **Bonus:** The chatbot boasts a sleek, **responsive web interface** with a **dark mode toggle** for an enhanced user experience!
 
 ---
 
-## ✨ **Features**
+## ✨ Features
+
+Our IT Support Chatbot comes packed with features to provide a robust and user-friendly experience:
 
 ✅ **Intelligent Chat Interface**
-
-* User-friendly web UI built with HTML, Tailwind CSS, and JavaScript
-* Responsive design for desktop and mobile
+* **User-friendly web UI** crafted with HTML, Tailwind CSS, and vanilla JavaScript for a modern look and feel.
+* **Responsive design** ensures a seamless experience across desktop and mobile devices.
 
 ✅ **AWS Lex V2 Integration**
+* Leverages **advanced Natural Language Understanding (NLU)** to accurately comprehend user intents and manage complex conversations.
 
-* Advanced natural language understanding (NLU)
-* Recognizes user intents and manages conversations
+✅ **Knowledge Base Powered by S3**
+* Integrated with an **AWS S3-backed Knowledge Base**, allowing the bot to pull answers directly from your provided documentation (e.g., PDFs of IT guides).
 
-✅ **Knowledge Base**
+✅ **Seamless Human Escalation**
+* Automatically escalates unresolved queries using **Lex’s `FallbackIntent`**, ensuring users always get the help they need.
+* Sends detailed **emails to the support team** via AWS Lambda and SES for efficient handover.
 
-* Integrated with an AWS S3-backed Knowledge Base (e.g. PDFs of IT guides)
-* Answers pulled directly from provided documentation
-
-✅ **Human Escalation**
-
-* Automatically escalates unresolved queries via Lex’s `FallbackIntent`
-* Sends email to support team through AWS Lambda + SES
-
-✅ **Conversation Logging**
-
-* Logs all user queries and bot responses in DynamoDB
-* Useful for analytics, audits, and bot improvement
+✅ **Comprehensive Conversation Logging**
+* **Logs all user queries and bot responses** in a dedicated DynamoDB table, perfect for analytics, auditing, and refining bot performance.
 
 ✅ **Bot Confidence Tracking**
-
-* Logs Lex’s confidence scores to browser console for analysis
+* Lex's confidence scores are logged directly to the browser console, providing valuable data for **performance analysis and optimization**.
 
 ✅ **Dynamic Response Formatting**
-
-* Client-side JavaScript formats multi-step responses (e.g. numbered lists) for better readability
+* Client-side JavaScript intelligently formats multi-step responses (e.g., numbered lists), enhancing **readability and user comprehension**.
 
 ✅ **Dark Mode Toggle**
+* Offers users the flexibility to **switch themes** between light and dark modes, with preferences conveniently saved in `localStorage`.
 
-* Users can switch themes
-* Preferences saved in `localStorage`
-
-✅ **Gratitude Handling**
-
-* `ThankYouIntent` enables the bot to respond naturally to user gratitude
+✅ **Natural Gratitude Handling**
+* Includes a dedicated `ThankYouIntent` to enable the bot to respond naturally and politely to user expressions of gratitude, making interactions more human-like.
 
 ---
 
-## 🗺️ **Architecture**
+## 🗺️ Architecture
 
-This chatbot uses a serverless architecture for scalability and cost efficiency.
+This chatbot is built on a robust, scalable, and cost-efficient **serverless architecture** leveraging the power of AWS services.
 
-
+```mermaid
 graph TD
     subgraph Frontend (HTML/CSS/JS)
         A[User Browser]
@@ -114,182 +98,335 @@ graph TD
         end
     end
 
-    A -->|Authenticates| B
-    A -->|recognizeText| C
-    A -->|POST /escalate| E
-    A -->|POST /store-query| H
-    C -->|Queries| D
-    C -->|Triggers| F
-    E -->|Lambda Proxy| F
-    F -->|Sends Email| G
-    H -->|Lambda Proxy| I
-    I -->|Writes Data| J
-    F -->|Logs| K
-    I -->|Logs| K
-    C -->|Logs| K
-```
+    A -- Authenticates --> B
+    A -- recognizeText --> C
+    A -- POST /escalate --> E
+    A -- POST /store-query --> H
+    C -- Queries --> D
+    C -- Triggers FallbackIntent --> F
+    E -- Lambda Proxy Integration --> F
+    F -- Sends Email --> G
+    H -- Lambda Proxy Integration --> I
+    I -- Writes Data --> J
+    F -- Logs --> K
+    I -- Logs --> K
+    C -- Logs --> K
+````
 
----
+-----
 
-## ⚙️ **Setup & Deployment Guide**
+## ⚙️ Setup & Deployment Guide
+
+Ready to get your IT Support Chatbot up and running? Follow these steps\!
 
 ### Prerequisites
 
-* AWS Account
-* AWS CLI (configured) OR AWS Console Access
-* Node.js (for Lambda runtime)
-* Python (for local HTTP server)
+Before you begin, ensure you have the following:
 
----
+  * An **AWS Account**
+  * **AWS CLI** (configured with appropriate permissions) OR **AWS Console Access**
+  * **Node.js** (for Lambda function runtime)
+  * **Python 3** (for local HTTP server to host the frontend)
 
-### **1. AWS DynamoDB Table Setup**
+-----
 
-1. Go to DynamoDB → **Create table**
-2. Table name: `ChatbotUserQueries`
-3. Partition key: `sessionId` (String)
-4. Sort key: `timestamp` (Number, optional but recommended)
-5. Save table
+### 1\. AWS DynamoDB Table Setup
 
----
+This table will store all chatbot interactions.
 
-### **2. AWS SES (Simple Email Service) Setup**
+1.  Navigate to **DynamoDB** in the AWS Console.
+2.  Click **Create table**.
+3.  Set **Table name**: `ChatbotUserQueries`
+4.  Define **Partition key**: `sessionId` (String)
+5.  *Optional but Recommended:* Define **Sort key**: `timestamp` (Number) for efficient querying of conversation history.
+6.  Leave default settings for other options and **Create table**.
 
-1. Go to SES → Verified identities
-2. Verify sender email (and recipient email if in sandbox mode)
-3. Move out of sandbox for production if needed
+-----
 
----
+### 2\. AWS SES (Simple Email Service) Setup
 
-### **3. AWS Lambda Functions**
+SES is used for sending escalation emails to your support team.
 
-#### **3.1 Escalation Function**
+1.  Go to **SES** in the AWS Console.
+2.  Navigate to **Verified identities**.
+3.  **Verify your sender email address** (the email from which the escalation emails will be sent).
+4.  If you are in **SES sandbox mode**, you will also need to verify the recipient email address(es) that the chatbot will send emails to. For production use, request to move out of sandbox mode.
 
-* Name: `escalateToHumanLambda`
-* Runtime: Node.js 18.x
-* Permissions:
+-----
 
-  * `ses:SendEmail`
-  * `ses:SendRawEmail`
+### 3\. AWS Lambda Functions
 
-**Code:** (Use your original snippet here for brevity)
+These functions power the core logic for escalation and data storage.
 
-#### **3.2 Store Query Function**
+#### 3.1 Escalation Function (`escalateToHumanLambda`)
 
-* Name: `storeUserQueryLambda`
-* Runtime: Node.js 18.x
-* Permissions:
+This function sends emails to human agents when the bot cannot resolve a query.
 
-  * `dynamodb:PutItem` on `ChatbotUserQueries`
+  * **Name**: `escalateToHumanLambda`
+  * **Runtime**: `Node.js 18.x` (or a later supported version)
+  * **Permissions**: Ensure the Lambda's execution role has the following IAM permissions:
+      * `ses:SendEmail`
+      * `ses:SendRawEmail`
 
-**Code:** (Use your original snippet here)
+*Code for `escalateToHumanLambda`:*
 
----
+```javascript
+// Example placeholder - Replace with your actual Lambda code
+const AWS = require('aws-sdk');
+const ses = new AWS.SES({ region: 'your-aws-region' }); // e.g., 'us-east-1'
 
-### **4. AWS API Gateway Setup**
+exports.handler = async (event) => {
+    try {
+        const { userQuery, conversationHistory, userEmail, userName } = JSON.parse(event.body);
 
-Two endpoints:
+        const params = {
+            Source: 'your-verified-sender-email@example.com', // Replace with your verified SES sender email
+            Destination: {
+                ToAddresses: ['your-support-team-email@example.com'] // Replace with support team email
+            },
+            Message: {
+                Subject: {
+                    Data: 'Chatbot Escalation: User Requires Human Support'
+                },
+                Body: {
+                    Html: {
+                        Data: `
+                            <html>
+                            <body>
+                                <h3>IT Chatbot Escalation</h3>
+                                <p>A user requires human assistance for the following query:</p>
+                                <p><strong>User Query:</strong> ${userQuery}</p>
+                                <p><strong>User Name:</strong> ${userName || 'N/A'}</p>
+                                <p><strong>User Email:</strong> ${userEmail || 'N/A'}</p>
+                                <hr>
+                                <h4>Conversation History:</h4>
+                                <pre>${JSON.stringify(conversationHistory, null, 2)}</pre>
+                            </body>
+                            </html>
+                        `
+                    }
+                }
+            }
+        };
 
-* `/escalate` → triggers `escalateToHumanLambda`
-* `/store-query` → triggers `storeUserQueryLambda`
+        await ses.sendEmail(params).promise();
 
-Ensure:
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Escalation email sent successfully!' }),
+            headers: {
+                'Access-Control-Allow-Origin': '*', // Adjust for your frontend domain in production
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST'
+            }
+        };
+    } catch (error) {
+        console.error('Error sending escalation email:', error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: 'Failed to send escalation email', error: error.message }),
+            headers: {
+                'Access-Control-Allow-Origin': '*', // Adjust for your frontend domain in production
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST'
+            }
+        };
+    }
+};
+```
 
-* Lambda Proxy integration enabled
-* CORS configured for your frontend origin
+#### 3.2 Store Query Function (`storeUserQueryLambda`)
 
----
+This function logs user queries and bot responses into DynamoDB.
 
-### **5. AWS Cognito Identity Pool Setup**
+  * **Name**: `storeUserQueryLambda`
+  * **Runtime**: `Node.js 18.x` (or a later supported version)
+  * **Permissions**: Ensure the Lambda's execution role has the following IAM permissions:
+      * `dynamodb:PutItem` on the `arn:aws:dynamodb:your-aws-region:your-aws-account-id:table/ChatbotUserQueries` (Replace `your-aws-region` and `your-aws-account-id` with your actual values).
 
-* Create identity pool
-* Enable unauthenticated identities
-* Attach permissions:
+*Code for `storeUserQueryLambda`:*
 
-  * `lexv2-runtime:RecognizeText`
-  * `execute-api:Invoke` on API Gateway endpoints
+```javascript
+// Example placeholder - Replace with your actual Lambda code
+const AWS = require('aws-sdk');
+const dynamodb = new AWS.DynamoDB.DocumentClient();
 
----
+exports.handler = async (event) => {
+    try {
+        const { sessionId, timestamp, userQuery, botResponse, confidenceScore, intentName } = JSON.parse(event.body);
 
-### **6. AWS Lex V2 Bot Setup**
+        const params = {
+            TableName: 'ChatbotUserQueries', // Your DynamoDB table name
+            Item: {
+                sessionId: sessionId,
+                timestamp: timestamp,
+                userQuery: userQuery,
+                botResponse: botResponse,
+                confidenceScore: confidenceScore,
+                intentName: intentName,
+                // Add any other relevant data you want to store
+            }
+        };
 
-* Create Lex bot
-* Add intents including:
+        await dynamodb.put(params).promise();
 
-  * FallbackIntent
-  * ThankYouIntent
-* Integrate S3 knowledge base
-* Point bot alias to Draft or desired version
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Query stored successfully!' }),
+            headers: {
+                'Access-Control-Allow-Origin': '*', // Adjust for your frontend domain in production
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST'
+            }
+        };
+    } catch (error) {
+        console.error('Error storing user query:', error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: 'Failed to store user query', error: error.message }),
+            headers: {
+                'Access-Control-Allow-Origin': '*', // Adjust for your frontend domain in production
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Methods': 'OPTIONS,POST'
+            }
+        };
+    }
+};
+```
 
----
+-----
 
-### **7. Frontend Deployment (HTML/JS)**
+### 4\. AWS API Gateway Setup
 
-* Update placeholders in `index.html`:
+API Gateway exposes your Lambda functions as REST endpoints for the frontend.
 
-  * Cognito IdentityPoolId
-  * Lex Bot ID and Alias
-  * API URLs for `/escalate` and `/store-query`
-* Serve locally:
+  * Create two new **REST APIs** (or resources under a single API):
+      * `/escalate` endpoint, configured to trigger `escalateToHumanLambda`.
+      * `/store-query` endpoint, configured to trigger `storeUserQueryLambda`.
+  * **Crucially, ensure:**
+      * **Lambda Proxy integration** is enabled for both endpoints. This passes the entire request directly to your Lambda function.
+      * **CORS** (Cross-Origin Resource Sharing) is configured on both endpoints to allow requests from your frontend origin (e.g., `http://localhost:8000` during development, or your deployed domain).
 
-  ```bash
-  python -m http.server 8000
-  ```
-* Open browser at:
+-----
 
-  ```
-  http://localhost:8000
-  ```
+### 5\. AWS Cognito Identity Pool Setup
 
----
+Cognito handles unauthenticated access for your frontend to interact with Lex and API Gateway.
 
-## 🛠️ **Troubleshooting Guide**
+1.  Navigate to **Cognito** in the AWS Console.
+2.  Select **Identity pools** and **Create new identity pool**.
+3.  Give it a name (e.g., `ChatbotIdentityPool`).
+4.  Under **Authentication providers**, expand **Unauthenticated identities** and check **Enable access to unauthenticated identities**.
+5.  Click **Create Pool**.
+6.  Cognito will create two roles (authenticated and unauthenticated). You will need to **edit the unauthenticated role** to attach the necessary permissions.
+7.  Attach the following IAM permissions to the **unauthenticated role**:
+      * `lexv2-runtime:RecognizeText` (allows calling the Lex bot)
+      * `execute-api:Invoke` on your API Gateway endpoints (e.g., `arn:aws:execute-api:your-aws-region:your-aws-account-id:your-api-id/*/*`). Be specific with the ARN to restrict access only to your chatbot's API endpoints.
 
-| **Issue**                       | **Possible Cause & Fix**                                             |
-| ------------------------------- | -------------------------------------------------------------------- |
-| **CORS Error**                  | Serve frontend locally. Enable CORS in API Gateway.                  |
-| **500 Error**                   | Check Lambda logs in CloudWatch for errors.                          |
-| **Unexpected Token Error**      | Ensure Lambda Proxy integration is enabled in API Gateway.           |
-| **UI Elements Missing**         | Check HTML IDs and ensure JS runs after DOM load.                    |
-| **Lex always escalates**        | Check knowledge base status and Lex alias version.                   |
-| **New Lex intents not working** | Always build the bot after changes and point alias to Draft version. |
+-----
 
----
+### 6\. AWS Lex V2 Bot Setup
 
-## 🖥️ **Usage**
+This is the core of your chatbot's conversational intelligence.
 
-1. Run local server
-2. Open chatbot page
-3. Ask IT support questions
-4. Chatbot attempts to answer or escalates via email
-5. All chats stored in DynamoDB
-6. Toggle dark mode as desired!
+1.  Go to **Amazon Lex V2** in the AWS Console.
+2.  **Create a new bot**.
+3.  Define relevant **Intents**, including:
+      * **`FallbackIntent`**: Configure this to trigger when Lex cannot understand the user's intent. This is where you can initiate the human escalation.
+      * **`ThankYouIntent`**: For natural responses to user gratitude.
+      * Other intents relevant to your IT support queries (e.g., `ResetPasswordIntent`, `CheckNetworkStatusIntent`).
+4.  **Integrate an S3 knowledge base**: If you want the bot to answer questions from documents, configure a Knowledge Base within Lex, pointing it to an S3 bucket containing your IT guides (e.g., PDFs).
+5.  **Build the bot** after making any changes.
+6.  **Create an Alias** for your bot (e.g., `chatbotAlias`) and point it to the **Draft** version during development, or a specific version for production.
 
----
+-----
 
-## 🚀 **Future Enhancements**
+### 7\. Frontend Deployment (HTML/JavaScript)
 
-* Admin dashboard for DynamoDB logs
-* Multi-turn dialogues
-* Sentiment analysis (Amazon Comprehend)
-* Voice integration (speech-to-text/text-to-speech)
-* Feedback ratings for responses
-* Richer response formatting
-* CloudWatch alerts for high fallback rates
+The user interface for your chatbot.
 
----
+1.  Open your `index.html` file in a text editor.
 
-## 🤝 **Contributing**
+2.  **Update the following placeholders** with your actual AWS resource details:
 
-Feel free to fork this repository, open issues, or submit pull requests!
+      * `Cognito IdentityPoolId`
+      * `Lex Bot ID` and `Lex Bot Alias`
+      * `API URLs` for your `/escalate` and `/store-query` endpoints (from API Gateway).
 
----
+3.  **Serve the frontend locally** using a simple HTTP server (Python is convenient):
 
-## 📄 **License**
+    ```bash
+    python -m http.server 8000
+    ```
 
-This project is open-source under the [MIT License](LICENSE).
+4.  Open your web browser and navigate to:
 
----
+    ```
+    http://localhost:8000
+    ```
 
-**🔗 Pro tip:** Add your own screenshots or GIFs of the chatbot in action to the top of the README for extra polish!
+-----
 
-Would you like me to embed your actual Lambda code snippets directly into this README as well? Or leave them as separate files? Let me know how you’d prefer it!
+## 🛠️ Troubleshooting Guide
+
+Encountering issues? Here's a quick guide to common problems and their solutions:
+
+| **Issue** | **Possible Cause & Fix** |
+| :------------------------------ | :------------------------------------------------------------------------------------------- |
+| **CORS Error** | Your browser is blocking requests. Ensure your **API Gateway has CORS enabled** for your frontend's origin (e.g., `http://localhost:8000`). Also, ensure your frontend is served from an HTTP server. |
+| **500 Internal Server Error** | This usually indicates a problem with your Lambda function. **Check CloudWatch Logs** for the specific Lambda function (`escalateToHumanLambda` or `storeUserQueryLambda`) to see detailed error messages. |
+| **Unexpected Token Error** | Often occurs when API Gateway's **Lambda Proxy integration is not enabled**. Verify this setting in API Gateway for both `/escalate` and `/store-query` methods.       |
+| **UI Elements Missing / JS not working** | Check your browser's developer console for JavaScript errors. Ensure HTML IDs match those referenced in your JavaScript, and that your JS runs after the DOM is fully loaded. |
+| **Lex always escalates / doesn't answer questions** | Verify the **status of your Lex Knowledge Base**. Ensure your Lex bot is **built** and the **alias is pointed to the correct version** (e.g., `Draft`) that includes your intents and knowledge base configuration. |
+| **New Lex intents not working / bot isn't learning** | After making **any changes to your Lex bot (intents, slots, prompts), you must explicitly Build the bot** for changes to take effect. Also, ensure your frontend is pointing to the correct Lex bot alias/version. |
+| **SES Email not received** | Check your SES **Verified Identities** status. If in sandbox mode, ensure both sender and recipient emails are verified. Check your spam folder. Review CloudWatch logs for `escalateToHumanLambda` for SES-related errors. |
+| **DynamoDB not storing data** | Check the **IAM permissions** for your `storeUserQueryLambda` function. It needs `dynamodb:PutItem` access to your `ChatbotUserQueries` table. Review CloudWatch logs for `storeUserQueryLambda`. |
+
+-----
+
+## 🖥️ Usage
+
+Interacting with your new IT Support Chatbot is simple and intuitive:
+
+1.  **Run your local server** (e.g., `python -m http.server 8000`).
+2.  **Open the chatbot page** in your web browser (`http://localhost:8000`).
+3.  Start **asking IT support questions**\!
+4.  The chatbot will attempt to answer using its knowledge base or, if unable, will **escalate the query via email** to your support team.
+5.  All conversation turns are **automatically stored in DynamoDB** for your review.
+6.  Feel free to **toggle dark mode** as desired for a comfortable viewing experience\!
+
+-----
+
+## 🚀 Future Enhancements
+
+We're continuously looking to improve\! Here are some exciting enhancements planned for the future:
+
+  * **Admin Dashboard for DynamoDB Logs**: A dedicated interface to easily view, filter, and analyze chatbot interactions.
+  * **Multi-Turn Dialogues**: Improve conversational flow for more complex, multi-step queries.
+  * **Sentiment Analysis (Amazon Comprehend)**: Integrate sentiment analysis to understand user emotions and prioritize urgent or frustrated interactions.
+  * **Voice Integration (Speech-to-Text/Text-to-Speech)**: Allow users to interact with the bot using their voice for greater accessibility and convenience.
+  * **Feedback Ratings for Responses**: Enable users to rate bot responses, providing direct feedback for continuous improvement.
+  * **Richer Response Formatting**: Expand beyond basic text to include images, cards, and quick replies for more engaging interactions.
+  * **CloudWatch Alerts for High Fallback Rates**: Proactive alerts when the bot frequently falls back to human escalation, indicating areas for knowledge base or intent improvement.
+
+-----
+
+## 🤝 Contributing
+
+We welcome contributions to make this IT Support Chatbot even better\! Feel free to:
+
+  * **Open issues** for bugs or feature requests 🐛
+  * **Submit pull requests** with your improvements ✨
+
+-----
+
+## 📄 License
+
+This project is open-source and distributed under the **[MIT License](https://www.google.com/search?q=LICENSE)**.
+
+-----
+
+**🔗 Pro tip:** Consider adding a GIF or a few screenshots of your chatbot in action right at the top of this README\! A visual demonstration goes a long way in showcasing your project's capabilities.
+
+```
+```
